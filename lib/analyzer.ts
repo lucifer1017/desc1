@@ -7,7 +7,7 @@ import parser, {
     MemberAccess,
     StateVariableDeclaration,
     Visitor
-} from "solidity-parser-antlr";
+} from "@solidity-parser/parser";
 import { VulnerabilityFinding, VulnerabilityName } from "./types";
 
 type AnalysisContext = {
