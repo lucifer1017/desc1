@@ -1,15 +1,15 @@
 import { parse, visit } from "@solidity-parser/parser";
-import type {
-    ASTNode,
-    BinaryOperation,
-    ExpressionStatement,
-    FunctionDefinition,
-    Location,
-    MemberAccess,
-    StateVariableDeclaration,
-    ASTVisitor
-} from "@solidity-parser/parser/dist/src/ast-types";
 import { VulnerabilityFinding, VulnerabilityName } from "./types";
+
+// Import types from the package - use type-only imports to avoid runtime issues
+type ASTNode = import("@solidity-parser/parser/dist/src/ast-types").ASTNode;
+type BinaryOperation = import("@solidity-parser/parser/dist/src/ast-types").BinaryOperation;
+type ExpressionStatement = import("@solidity-parser/parser/dist/src/ast-types").ExpressionStatement;
+type FunctionDefinition = import("@solidity-parser/parser/dist/src/ast-types").FunctionDefinition;
+type Location = import("@solidity-parser/parser/dist/src/ast-types").Location;
+type MemberAccess = import("@solidity-parser/parser/dist/src/ast-types").MemberAccess;
+type StateVariableDeclaration = import("@solidity-parser/parser/dist/src/ast-types").StateVariableDeclaration;
+type ASTVisitor = import("@solidity-parser/parser/dist/src/ast-types").ASTVisitor;
 
 type AnalysisContext = {
     sourceLines: string[];

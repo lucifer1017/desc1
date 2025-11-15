@@ -1,12 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  // Ensure these packages are properly handled for server-side rendering
-  // This is required for packages that use CommonJS or have Node.js dependencies
-  serverComponentsExternalPackages: [
-    '@solidity-parser/parser',
-    'owasp-nest'
-  ],
+  // Transpile packages that use CommonJS or have Node.js dependencies
+  transpilePackages: ['@solidity-parser/parser', 'owasp-nest'],
   eslint: {
     // Ignore ESLint errors during build to prevent build failures
     ignoreDuringBuilds: true,
