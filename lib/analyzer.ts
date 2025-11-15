@@ -1,4 +1,5 @@
-import parser, {
+import { parse, visit } from "@solidity-parser/parser";
+import type {
     ASTNode,
     BinaryOperation,
     ExpressionStatement,
@@ -6,8 +7,8 @@ import parser, {
     Location,
     MemberAccess,
     StateVariableDeclaration,
-    Visitor
-} from "@solidity-parser/parser";
+    ASTVisitor
+} from "@solidity-parser/parser/dist/src/ast-types";
 import { VulnerabilityFinding, VulnerabilityName } from "./types";
 
 type AnalysisContext = {
@@ -46,7 +47,7 @@ export function analyzeSolidity(source: string): VulnerabilityFinding[] {
     let ast: ASTNode;
 
     try {
-        ast = parser.parse(source, { tolerant: true, loc: true, range: true });
+        ast = parse(source, { tolerant: true, loc: true, range: true });
     } catch (error) {
         return [
             {
@@ -60,7 +61,7 @@ export function analyzeSolidity(source: string): VulnerabilityFinding[] {
 
     const findings: VulnerabilityFinding[] = [];
 
-    parser.visit(ast, {
+    visit(ast, {
         PragmaDirective: (node) => {
             if (node.name === "solidity" && typeof node.value === "string") {
                 context.pragmaVersion = node.value;
@@ -82,7 +83,7 @@ export function analyzeSolidity(source: string): VulnerabilityFinding[] {
             };
 
             if (node.body) {
-                parser.visit(
+                visit(
                     node.body,
                     {
                         ExpressionStatement: (exprNode: ExpressionStatement) => {
@@ -129,7 +130,7 @@ export function analyzeSolidity(source: string): VulnerabilityFinding[] {
                                 fnContext.unsafeArithmetic.push(binaryOperationNode);
                             }
                         }
-                    } as unknown as Visitor
+                    } as unknown as ASTVisitor
                 );
             }
 
