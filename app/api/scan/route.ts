@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { analyzeSolidity } from "../../../lib/analysis/analyzer";
+import { analyzeSolidity } from "../../../lib/analyzer";
 import { enrichFindingsWithGuidelines } from "../../../lib/analysis/owasp";
 import type { EnrichedVulnerabilityFinding } from "../../../lib/analysis/types";
 
@@ -36,20 +36,24 @@ export async function POST(request: Request) {
 
     try {
         // Step 1: Parse and analyze Solidity code
+        console.log("[SCAN] Starting analysis on", source.length, "characters");
         const analysisFindings = analyzeSolidity(source);
+        console.log("[SCAN] Analysis found", analysisFindings.length, "vulnerabilities");
         
         // Step 2: Enrich findings with OWASP guidelines (with timeout protection)
         let enrichedFindings: EnrichedVulnerabilityFinding[];
         try {
             // Set a timeout for OWASP API calls (10 seconds)
+            console.log("[SCAN] Enriching with OWASP guidelines...");
             enrichedFindings = await Promise.race([
                 enrichFindingsWithGuidelines(analysisFindings),
                 new Promise<EnrichedVulnerabilityFinding[]>((_, reject) => 
                     setTimeout(() => reject(new Error("OWASP API timeout")), 10000)
                 )
             ]);
+            console.log("[SCAN] OWASP enrichment successful");
         } catch (guidelineError) {
-            console.error("Guideline enrichment error:", guidelineError);
+            console.error("[SCAN] Guideline enrichment error:", guidelineError);
             // Fallback: use findings without OWASP guidelines
             enrichedFindings = analysisFindings.map((finding) => ({
                 ...finding,
@@ -59,6 +63,7 @@ export async function POST(request: Request) {
 
         const status = enrichedFindings.length > 0 ? "unsafe" : "safe";
 
+        console.log("[SCAN] Returning response with status:", status, "findings:", enrichedFindings.length);
         return NextResponse.json({
             vulnerabilities: enrichedFindings.map((finding) => ({
                 name: finding.name,
@@ -70,7 +75,7 @@ export async function POST(request: Request) {
             status
         });
     } catch (error) {
-        console.error("Unexpected error in scan route:", error);
+        console.error("[SCAN] Unexpected error in scan route:", error);
         return NextResponse.json(
             {
                 message: "Unable to analyze Solidity source file.",

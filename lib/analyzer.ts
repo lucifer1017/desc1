@@ -33,7 +33,7 @@ type AssignmentExpression = {
 // IERC20.transfer() and IERC20.transferFrom() are high-level interface methods and should not be flagged
 // Only flag: call, delegatecall, callcode, staticcall, send
 // Do NOT flag: transfer, transferFrom (these are IERC20 interface methods)
-const LOW_LEVEL_CALLS = new Set(["call", "delegatecall", "callcode", "staticcall", "send"]);
+const LOW_LEVEL_CALLS = new Set(["call", "delegatecall", "callcode", "staticcall", "send", "transfer"]);
 const ACCESS_CONTROL_MODIFIERS = new Set(["onlyOwner", "onlyRole", "adminOnly", "authorized"]);
 const ARITHMETIC_OPERATORS = new Set(["+", "-", "*", "/"]);
 
